@@ -5,6 +5,8 @@ import com.zenitho.api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -15,5 +17,15 @@ public class UserController {
     @PostMapping
     public User createUser(@RequestParam String name, @RequestParam String username, @RequestParam String password, @RequestParam String email) {
         return userService.createUser(username, name, email, password);
+    }
+
+    @GetMapping
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Long id) {
+        return userService.getUserById(id);
     }
 }
