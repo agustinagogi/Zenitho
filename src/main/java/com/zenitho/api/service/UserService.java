@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authorization.method.AuthorizeReturnObject;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -26,25 +27,6 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User createUser(String name, String username, String email, String password){
-        User newUser = new User();
-        newUser.setName(name);
-        newUser.setUsername(username);
-        newUser.setEmail(email);
-
-        newUser.setPassword(passwordEncoder.encode(password));
-
-        // Asignar el rol por defecto
-        Set<Role> roles = new HashSet<>();
-        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                .orElseThrow(() -> new RuntimeException("Error: Role not found."));
-        roles.add(userRole);
-        newUser.setRoles(roles);
-
-        return userRepository.save(newUser);
-
-    }
-
     public List<User> getAllUsers(){
         return userRepository.findAll();
     }
@@ -54,21 +36,25 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("No se encontr<UNK> el usuario con el id " + userId));
     }
 
-    public User updateUser(Long userId, String newName, String newUsername, String newEmail) {
-        User existingUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+    public User createUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        Role role = roleRepository.findByName(ERole.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("Role USER not found"));
+        user.getRoles().add(role);
+        return userRepository.save(user);
+    }
 
-        if (newName != null) {
-            existingUser.setName(newName);
+    @Transactional
+    public User updateUser(Long id, User user) {
+        User db = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        db.setName(user.getName());
+        db.setUsername(user.getUsername());
+        db.setEmail(user.getEmail());
+        if (user.getPassword() != null && !user.getPassword().isBlank()) {
+            db.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-        if (newUsername != null) {
-            existingUser.setUsername(newUsername);
-        }
-        if (newEmail != null) {
-            existingUser.setEmail(newEmail);
-        }
-
-        return userRepository.save(existingUser);
+        return userRepository.save(db);
     }
 
     public void deleteUser(Long userId) {
