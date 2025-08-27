@@ -8,6 +8,7 @@ import org.hibernate.engine.jdbc.mutation.TableInclusionChecker;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class BoardService {
@@ -28,5 +29,14 @@ public class BoardService {
         newBoard.setMembers(Collections.singleton(creator));
 
         return boardRepository.save(newBoard);
+    }
+
+    public List<Board> getAllBoards(){
+        return boardRepository.findAll();
+    }
+
+    public Board getBoardById(Long id){
+        return boardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Board not found"));
     }
 }
