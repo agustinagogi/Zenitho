@@ -43,4 +43,20 @@ public class CardService {
         return cardRepository.findById(cardId)
                 .orElseThrow(() -> new RuntimeException("Card not found with id: " + cardId));
     }
+
+    public Card updateCardTitle(Long cardId, String newTitle) {
+        Card existingCard = cardRepository.findById(cardId)
+                .orElseThrow(() -> new RuntimeException("Card not found with id: " + cardId));
+
+        existingCard.setTitle(newTitle);
+        // Aquí podríamos añadir lógica para actualizar el contenido, la posición, etc.
+        return cardRepository.save(existingCard);
+    }
+
+    public void deleteCard(Long cardId) {
+        if (!cardRepository.existsById(cardId)) {
+            throw new RuntimeException("Card not found with id: " + cardId);
+        }
+        cardRepository.deleteById(cardId);
+    }
 }
