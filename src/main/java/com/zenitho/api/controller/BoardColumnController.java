@@ -5,6 +5,8 @@ import com.zenitho.api.service.BoardColumnService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/columns")
 public class BoardColumnController {
@@ -15,5 +17,15 @@ public class BoardColumnController {
     @PostMapping
     public BoardColumn createColumn(@RequestParam String title, @RequestParam Long boardId) {
         return columnService.createColumn(title, boardId);
+    }
+
+    @GetMapping
+    public List<BoardColumn> getAllColumns() {
+        return columnService.getAllColumns();
+    }
+
+    @GetMapping("/{id}")
+    public BoardColumn getColumnById(@PathVariable Long id) {
+        return columnService.getColumnById(id);
     }
 }
