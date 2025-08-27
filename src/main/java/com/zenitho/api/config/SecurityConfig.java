@@ -53,11 +53,14 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()          // login, register si lo pones aquí
-                        .requestMatchers(HttpMethod.POST, "/api/users/**").permitAll() // ✅ cualquier subruta de /api/users
-                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN") // 👈 NEW
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users/admin").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}/roles").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasRole("ADMIN") // 👈 NEW
                         .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()        // ✅ preflight del navegador
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
