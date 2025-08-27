@@ -23,7 +23,7 @@ public class JwtUtils {
 
     private static final long JWT_EXPIRATION_MS = 604800000; // 7 días
 
-    private String generateJwtToken(String username){
+    public String generateJwtToken(String username){
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
