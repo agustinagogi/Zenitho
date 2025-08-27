@@ -28,4 +28,14 @@ public class BoardController {
     public Board getBoard (@PathVariable Long id) {
         return boardService.getBoardById(id);
     }
+
+    @PutMapping("/{id}")
+    public Board updateBoard (@PathVariable Long id, @RequestParam String newTitle) {
+        return boardService.updateBoard(id, newTitle);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteBoard (@PathVariable Long id) {
+        boardService.deleteBoard(id);
+    }
 }
