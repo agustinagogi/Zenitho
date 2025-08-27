@@ -34,4 +34,13 @@ public class CardService {
 
         return cardRepository.save(newCard);
     }
+
+    public List<Card> getAllCards() {
+        return cardRepository.findAll();
+    }
+
+    public Card getCardById(Long cardId) {
+        return cardRepository.findById(cardId)
+                .orElseThrow(() -> new RuntimeException("Card not found with id: " + cardId));
+    }
 }
