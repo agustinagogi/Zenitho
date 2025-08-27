@@ -38,9 +38,10 @@ public class JwtUtils {
 
     public boolean validateJwtToken(String authToken) {
         try {
-            Jwts.parserBuilder().setSigningKey(getSigningKey()).build();
+            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(authToken);
             return true;
         } catch (Exception e) {
+            // Aquí puedes añadir logs para ver por qué falló la validación (token expirado, firma inválida, etc.)
             return false;
         }
     }
