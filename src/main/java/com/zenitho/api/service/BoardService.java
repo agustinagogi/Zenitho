@@ -39,4 +39,20 @@ public class BoardService {
         return boardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Board not found"));
     }
+
+    public Board updateBoard(Long boardId, String newTitle){
+        Board existingBoard = boardRepository.findById(boardId)
+                .orElseThrow(() -> new RuntimeException("Board not found"));
+
+        existingBoard.setTitle(newTitle);
+        return boardRepository.save(existingBoard);
+    }
+
+    public void deleteBoard(Long boardId){
+        if (!boardRepository.existsById(boardId)) {
+            throw new RuntimeException("Board not found");
+        }
+
+        boardRepository.deleteById(boardId);
+    }
 }
