@@ -16,7 +16,7 @@ public class Board {
     private Long id;
 
     @Column(nullable = false)
-    private String titulo;
+    private String title;
 
     // Relaciones
 
