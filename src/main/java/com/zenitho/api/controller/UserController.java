@@ -10,13 +10,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    public UserController(UserService userService) { this.userService = userService; }
 
     @PostMapping
-    public User createUser(@RequestParam String name, @RequestParam String username, @RequestParam String password, @RequestParam String email) {
-        return userService.createUser(name, username, email, password);
+    public User createUser(@RequestBody User user) {
+        return userService.createUser(user);
+    }
+
+    @PutMapping("/{id}")
+    public User updateUser(@PathVariable Long id, @RequestBody User user) {
+        return userService.updateUser(id, user);
     }
 
     @GetMapping
@@ -27,11 +31,6 @@ public class UserController {
     @GetMapping("/{id}")
     public User getUser(@PathVariable Long id) {
         return userService.getUserById(id);
-    }
-
-    @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestParam String name, @RequestParam String username, @RequestParam String email) {
-        return userService.updateUser(id, name, username, email);
     }
 
     @DeleteMapping("/{id}")
