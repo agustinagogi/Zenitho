@@ -28,6 +28,6 @@ public class User {
     @ManyToMany(mappedBy = "members")
     private Set<Board> boards;
 
-    @ManyToMany(mappedBy = "assigness")
+    @ManyToMany(mappedBy = "assignees")
     private Set<Card> assignedCards;
 }
