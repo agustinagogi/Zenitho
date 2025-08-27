@@ -28,4 +28,14 @@ public class BoardColumnController {
     public BoardColumn getColumnById(@PathVariable Long id) {
         return columnService.getColumnById(id);
     }
+
+    @PutMapping("/{id}")
+    public BoardColumn updateColumnTitle(@PathVariable Long id, @RequestParam String newTitle) {
+        return columnService.updateColumnTitle(id, newTitle);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteColumn(@PathVariable Long id) {
+        columnService.deleteColumn(id);
+    }
 }
