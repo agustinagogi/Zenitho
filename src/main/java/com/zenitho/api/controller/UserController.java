@@ -1,0 +1,19 @@
+package com.zenitho.api.controller;
+
+import com.zenitho.api.entities.User;
+import com.zenitho.api.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    @PostMapping
+    public User createUser(@RequestParam String name, @RequestParam String username, @RequestParam String password, @RequestParam String email) {
+        return userService.createUser(username, name, email, password);
+    }
+}
