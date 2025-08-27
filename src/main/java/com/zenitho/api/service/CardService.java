@@ -6,6 +6,7 @@ import com.zenitho.api.repositories.BoardColumnRepository;
 import com.zenitho.api.repositories.CardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +47,16 @@ public class CardService {
 
         existingCard.setTitle(cardDetails.getTitle());
         existingCard.setContent(cardDetails.getContent()); // 👈 Guardamos el contenido enriquecido
+
+        return cardRepository.save(existingCard);
+    }
+
+    @Transactional
+    public Card updateCardContent(Long cardId, String newContent) {
+        Card existingCard = cardRepository.findById(cardId)
+                .orElseThrow(() -> new RuntimeException("Card not found with id: " + cardId));
+
+        existingCard.setContent(newContent);
 
         return cardRepository.save(existingCard);
     }
