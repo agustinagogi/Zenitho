@@ -19,19 +19,15 @@ public class CardService {
     @Autowired
     private BoardColumnRepository columnRepository;
 
-    public Card createCard (String title, Long columnId) {
+    public Card createCard (Card newCard, Long columnId) {
         // Buscamos la columna para asegurarnos de que existe
         BoardColumn column = columnRepository.findById(columnId)
                 .orElseThrow(() -> new RuntimeException("Column not found with id: " + columnId));
 
-        // Creamos la tarjeta
-
-        Card newCard = new Card();
-        newCard.setTitle(title);
+        // Asignamos la columna a la nueva tarjeta
         newCard.setColumn(column);
 
         // Guardamos la tarjeta en la BBDD y la devolvemos
-
         return cardRepository.save(newCard);
     }
 
@@ -44,12 +40,13 @@ public class CardService {
                 .orElseThrow(() -> new RuntimeException("Card not found with id: " + cardId));
     }
 
-    public Card updateCardTitle(Long cardId, String newTitle) {
+    public Card updateCard(Long cardId, Card cardDetails) {
         Card existingCard = cardRepository.findById(cardId)
                 .orElseThrow(() -> new RuntimeException("Card not found with id: " + cardId));
 
-        existingCard.setTitle(newTitle);
-        // Aquí podríamos añadir lógica para actualizar el contenido, la posición, etc.
+        existingCard.setTitle(cardDetails.getTitle());
+        existingCard.setContent(cardDetails.getContent()); // 👈 Guardamos el contenido enriquecido
+
         return cardRepository.save(existingCard);
     }
 
