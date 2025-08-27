@@ -37,4 +37,28 @@ public class UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("No se encontr<UNK> el usuario con el id " + userId));
     }
+
+    public User updateUser(Long userId, String newName, String newUsername, String newEmail) {
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        if (newName != null) {
+            existingUser.setName(newName);
+        }
+        if (newUsername != null) {
+            existingUser.setUsername(newUsername);
+        }
+        if (newEmail != null) {
+            existingUser.setEmail(newEmail);
+        }
+
+        return userRepository.save(existingUser);
+    }
+
+    public void deleteUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found with id: " + userId);
+        }
+        userRepository.deleteById(userId);
+    }
 }
