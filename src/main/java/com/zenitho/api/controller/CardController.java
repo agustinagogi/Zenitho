@@ -34,6 +34,12 @@ public class CardController {
         return cardService.updateCard(id, card);
     }
 
+    // Para actualizar solo el contenido de una tarjeta
+    @PatchMapping("/{id}/content")
+    public Card updateCardContent(@PathVariable Long id, @RequestBody String content) {
+        return cardService.updateCardContent(id, content);
+    }
+
     @DeleteMapping("/{id}")
     public void deleteCard(@PathVariable Long id) {
         cardService.deleteCard(id);
