@@ -28,4 +28,14 @@ public class CardController {
     public Card getCardById(@PathVariable Long id) {
         return cardService.getCardById(id);
     }
+
+    @PutMapping("/{id}")
+    public Card updateCardTitle(@PathVariable Long id, @RequestParam String newTitle) {
+        return cardService.updateCardTitle(id, newTitle);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteCard(@PathVariable Long id) {
+        cardService.deleteCard(id);
+    }
 }
