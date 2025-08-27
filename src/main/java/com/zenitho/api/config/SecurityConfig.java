@@ -39,16 +39,21 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Endpoints públicos que NO requieren autenticación
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll() // Permite a todos ver la lista de usuarios (solo GET)
-                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // Permite a todos crear un usuario
-                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}").authenticated() // Solo usuarios autenticados pueden actualizar
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("ADMIN") // Solo ADMIN puede eliminar
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+
+                        // Endpoints de solo lectura (GET) que son públicos
+                        .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+
+                        // Cualquier otra petición (PUT, DELETE, POST a otras rutas) requiere autenticación
                         .anyRequest().authenticated()
                 );
 
