@@ -27,7 +27,7 @@ public class Card {
 
     @ManyToOne
     @JoinColumn(name = "column_id", nullable = false)
-    private BoardColumn boardColumn;
+    private BoardColumn column;
 
     @ManyToMany
     @JoinTable(
