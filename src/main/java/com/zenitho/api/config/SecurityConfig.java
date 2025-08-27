@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()          // login, register si lo pones aquí
                         .requestMatchers(HttpMethod.POST, "/api/users/**").permitAll() // ✅ cualquier subruta de /api/users
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN") // 👈 NEW
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()        // ✅ preflight del navegador
                         .anyRequest().authenticated()
