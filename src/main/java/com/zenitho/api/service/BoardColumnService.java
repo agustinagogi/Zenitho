@@ -7,6 +7,8 @@ import com.zenitho.api.repositories.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BoardColumnService {
 
@@ -25,5 +27,13 @@ public class BoardColumnService {
         newColumn.setTitle(title);
 
         return columnRepository.save(newColumn);
+    }
+
+    public List<BoardColumn> getAllColumns(){
+        return (List<BoardColumn>) columnRepository.findAll();
+    }
+
+    public BoardColumn getColumnById(Long columnId){
+        return columnRepository.findById(columnId).orElseThrow(() -> new RuntimeException("Column not found with id: " + columnId));
     }
 }
