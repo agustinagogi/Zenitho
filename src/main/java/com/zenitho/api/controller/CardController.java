@@ -15,8 +15,8 @@ public class CardController {
     CardService cardService;
 
     @PostMapping
-    public Card createCard(@RequestParam String title, @RequestParam Long columnId) {
-        return cardService.createCard(title, columnId);
+    public Card createCard(@RequestBody Card card, @RequestParam Long columnId) {
+        return cardService.createCard(card, columnId);
     }
 
     @GetMapping
@@ -30,8 +30,8 @@ public class CardController {
     }
 
     @PutMapping("/{id}")
-    public Card updateCardTitle(@PathVariable Long id, @RequestParam String newTitle) {
-        return cardService.updateCardTitle(id, newTitle);
+    public Card updateCard(@PathVariable Long id, @RequestBody Card card) {
+        return cardService.updateCard(id, card);
     }
 
     @DeleteMapping("/{id}")
