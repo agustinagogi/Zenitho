@@ -14,52 +14,60 @@ const Dashboard = ({onLogout}) => {
     useEffect(() => {
         const fetchUserData = async () => {
             const token = localStorage.getItem('jwtToken');
-            if (token) {
-                try {
-                    // Llamada al nuevo endpoint para obtener los datos del usuario
-                    const userResponse = await fetch('http://localhost:8080/api/users/me', {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                        },
-                    });
+            if (!token) {
+                // Si no hay token, no intentes cargar datos.
+                onLogout();
+                return;
+            }
 
-                    if (userResponse.ok) {
-                        const userData = await userResponse.json();
-                        setUser(userData); // Guardamos el objeto completo del usuario
-                    } else {
-                        console.error("Error al obtener los datos del usuario.");
-                        return; // Detenemos la ejecución si no podemos obtener el usuario
-                    }
+            try {
+                // Llamada para obtener los datos del usuario
+                const userResponse = await fetch('http://localhost:8080/api/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
 
-                    // Obtenemos los datos del tablero
-                    const boardResponse = await fetch('http://localhost:8080/api/boards', {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                        },
-                    });
-
-                    if (!boardResponse.ok) {
-                        throw new Error('Error al obtener los tableros.');
-                    }
-
-                    const boards = await boardResponse.json();
-                    if (boards && boards.length > 0) {
-                        setBoards(boards);
-                        if (activeBoard) {
-                            const current = boards.find(b => b.id === activeBoard.id) || boards[0];
-                            setActiveBoard(current);
-                        } else {
-                            setActiveBoard(boards[0]);
-                        }
-                    }
-                } catch (error) {
-                    console.error("Error al obtener los datos de la aplicación:", error);
+                if (!userResponse.ok) {
+                    console.error("Error al obtener los datos del usuario. Forzando cierre de sesión.");
+                    onLogout();
+                    return;
                 }
+
+                const userData = await userResponse.json();
+                setUser(userData);
+
+                // Llamada para obtener los datos de los tableros
+                const boardResponse = await fetch('http://localhost:8080/api/boards', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (!boardResponse.ok) {
+                    console.error("Error al obtener los tableros. Forzando cierre de sesión.");
+                    onLogout();
+                    return;
+                }
+
+                const boards = await boardResponse.json();
+                if (boards && boards.length > 0) {
+                    setBoards(boards);
+                    if (activeBoard) {
+                        const current = boards.find(b => b.id === activeBoard.id) || boards[0];
+                        setActiveBoard(current);
+                    } else {
+                        setActiveBoard(boards[0]);
+                    }
+                }
+            } catch (error) {
+                console.error("Error al obtener los datos de la aplicación:", error);
+                onLogout();
             }
         };
 
         fetchUserData();
-    }, [refreshBoards]);
+    }, [refreshBoards, onLogout, activeBoard]);
 
     const handleLogoutSuccess = () => {
         localStorage.removeItem('jwtToken');
