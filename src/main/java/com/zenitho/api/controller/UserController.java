@@ -26,10 +26,10 @@ public class UserController {
     @GetMapping("/me") // 👈 Nuevo endpoint para obtener los datos del usuario actual
     public User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName(); // El email del usuario está en el nombre de autenticación
+        String username  = authentication.getName(); // El email del usuario está en el nombre de autenticación
 
-        return userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + userEmail));
+        return userRepository.findByUsername(username )
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + username ));
     }
 
     @PostMapping
