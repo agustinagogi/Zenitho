@@ -152,13 +152,13 @@ const Dashboard = ({onLogout}) => {
                 <div className="w-full space-y-2">
                     <button
                         onClick={() => setShowAddBoardModal(true)}
-                        className="w-full p-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-md text-sm"
+                        className="w-full p-2 bg-blue-500 hover:bg-blue-600 text-black font-bold rounded-md text-sm"
                     >
                         Añadir Tablero
                     </button>
                     <button
                         onClick={() => setShowAddCardModal(true)}
-                        className="w-full p-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-md text-sm"
+                        className="w-full p-2 bg-green-500 hover:bg-green-600 text-black font-bold rounded-md text-sm"
                     >
                         Añadir Tarjeta
                     </button>
@@ -184,7 +184,7 @@ const Dashboard = ({onLogout}) => {
 
                     <button
                         onClick={handleLogoutSuccess}
-                        className="ml-4 p-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-md"
+                        className="ml-4 p-2 bg-red-500 hover:bg-red-600 text-black font-bold rounded-md"
                     >
                         Cerrar sesión
                     </button>
