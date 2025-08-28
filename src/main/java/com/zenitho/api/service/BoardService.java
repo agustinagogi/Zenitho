@@ -7,9 +7,11 @@ import com.zenitho.api.repositories.UserRepository;
 import org.hibernate.engine.jdbc.mutation.TableInclusionChecker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class BoardService {
@@ -29,9 +31,14 @@ public class BoardService {
         Board newBoard = new Board();
 
         newBoard.setTitle(title);
-        newBoard.setMembers(Collections.singleton(creator));
+        newBoard.setMembers(Set.of(creator));
 
         return boardRepository.save(newBoard);
+    }
+
+    @Transactional
+    public List<Board> getAllBoardsForUser(Long userId){ // 👈 Cambia el nombre del método para mayor claridad
+        return boardRepository.findByMembersId(userId); // 👈 Usar el nuevo método
     }
 
     public List<Board> getAllBoards(){
