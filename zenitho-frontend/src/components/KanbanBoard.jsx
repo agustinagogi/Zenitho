@@ -1,51 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import CardEditor from './CardEditor';
 import CardContent from './CardContent';
 
-const KanbanBoard = () => {
-    const [board, setBoard] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+const KanbanBoard = ({board}) => {
     const [editingCardId, setEditingCardId] = useState(null);
-
-    useEffect(() => {
-        const fetchBoardData = async () => {
-            const token = localStorage.getItem('jwtToken'); // Obtén el token del almacenamiento local
-            if (!token) {
-                setError('No hay token de autenticación. Por favor, inicia sesión.');
-                setLoading(false);
-                return;
-            }
-
-            try {
-                // Asumiendo que obtienes el primer tablero del usuario
-                // En un proyecto más avanzado, tendrías un endpoint para obtener el tablero actual del usuario
-                const response = await fetch('http://localhost:8080/api/boards', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error('Error al obtener los datos del tablero.');
-                }
-
-                const boards = await response.json();
-                // Asignamos el primer tablero que devuelva el backend
-                if (boards && boards.length > 0) {
-                    setBoard(boards[0]);
-                } else {
-                    setError('No se encontraron tableros.');
-                }
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchBoardData();
-    }, []); // La dependencia vacía asegura que se ejecuta solo una vez al montar
 
     const handleUpdateCardContent = async (cardId, newContent) => {
         const token = localStorage.getItem('jwtToken');
@@ -74,15 +32,6 @@ const KanbanBoard = () => {
             console.error('Error al guardar el contenido:', error);
         }
     };
-
-
-    if (loading) {
-        return <div className="text-center mt-8">Cargando tablero...</div>;
-    }
-
-    if (error) {
-        return <div className="text-center mt-8 text-red-500">Error: {error}</div>;
-    }
 
     if (!board) {
         return <div className="text-center mt-8">No hay tablero para mostrar.</div>;
