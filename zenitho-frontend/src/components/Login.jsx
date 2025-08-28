@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 
-const Login = () => {
+const Login = ({ onLoginSuccess }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -12,24 +12,25 @@ const Login = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({email, password}),
+                body: JSON.stringify({ email, password }),
             });
 
-            if(response.ok) {
-                const token = await response.json();
+            if (response.ok) {
+                const token = await response.text();
                 localStorage.setItem('jwtToken', token);
-                console.log("Successfully logged in");
+                console.log('Login exitoso. Token JWT guardado.');
+                onLoginSuccess(); // 👈 Llama a la función del padre para actualizar el estado
             } else {
-                console.error('Unable to log in.');
+                console.error('Credenciales incorrectas.');
             }
-        } catch (error){
-            console.error('Unable to log in.');
+        } catch (error) {
+            console.error('Hubo un problema con la solicitud:', error);
         }
     };
 
     return (
         <form onSubmit={handleLogin} className="p-4 flex flex-col space-y-4">
-            <h2 className="text-2xl font-bold">Iniciar sesión</h2>
+            <h2 className="text-2xl font-bold">Iniciar Sesión</h2>
             <input
                 type="email"
                 value={email}
@@ -38,7 +39,6 @@ const Login = () => {
                 className="p-2 border border-gray-300 rounded"
                 required
             />
-
             <input
                 type="password"
                 value={password}
@@ -47,7 +47,8 @@ const Login = () => {
                 className="p-2 border border-gray-300 rounded"
                 required
             />
-            <button type="submit" className="p-2 bg-green-500 text-white rounded hover:bg-green-600">Iniciar sesión
+            <button type="submit" className="p-2 bg-green-500 text-white rounded hover:bg-green-600">
+                Iniciar Sesión
             </button>
         </form>
     );
