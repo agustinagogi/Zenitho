@@ -1,35 +1,60 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import Login from './components/Login.jsx';
+import Dashboard from './components/Dashboard.jsx';
+import './App.css';
+import Register from './components/Register.jsx';
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isRegistering, setIsRegistering] = useState(false); // Nuevo estado
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    useEffect(() => {
+        const token = localStorage.getItem('jwtToken');
+        if (token) {
+            setIsLoggedIn(true);
+        }
+    }, []);
+
+    const handleLoginSuccess = () => {
+        setIsLoggedIn(true);
+    };
+
+    const handleRegisterSuccess = () => {
+        // Lógica después de un registro exitoso (ej. iniciar sesión automáticamente)
+        setIsLoggedIn(true);
+    };
+
+    if (isLoggedIn) {
+        return <Dashboard />;
+    }
+
+    return (
+        <div className="flex justify-center items-center h-screen bg-gray-100">
+            <div className="bg-white p-8 rounded-lg shadow-md w-96">
+                {isRegistering ? (
+                    <>
+                        <Register onRegisterSuccess={handleRegisterSuccess} />
+                        <p className="mt-4 text-center">
+                            ¿Ya tienes una cuenta?{' '}
+                            <button onClick={() => setIsRegistering(false)} className="text-blue-500 hover:underline">
+                                Inicia sesión
+                            </button>
+                        </p>
+                    </>
+                ) : (
+                    <>
+                        <Login onLoginSuccess={handleLoginSuccess} />
+                        <p className="mt-4 text-center">
+                            ¿No tienes una cuenta?{' '}
+                            <button onClick={() => setIsRegistering(true)} className="text-blue-500 hover:underline">
+                                Regístrate
+                            </button>
+                        </p>
+                    </>
+                )}
+            </div>
+        </div>
+    );
 }
 
-export default App
+export default App;
