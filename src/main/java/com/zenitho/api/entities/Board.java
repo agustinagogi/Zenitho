@@ -20,9 +20,10 @@ public class Board {
     private String title;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OrderBy("position")
     private List<BoardColumn> columns;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "board_members",
             joinColumns = @JoinColumn(name = "board_id"),
