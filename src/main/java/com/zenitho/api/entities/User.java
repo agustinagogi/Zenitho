@@ -1,5 +1,6 @@
 package com.zenitho.api.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,8 +20,8 @@ public class User {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(nullable = false)          // 👈 nuevo
-    private String name;               // 👈 nuevo
+    @Column(nullable = false)
+    private String name;
 
     @Column(nullable = false, unique = true)
     private String username;
@@ -29,6 +30,7 @@ public class User {
     private String email;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -39,7 +41,6 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
-    // opcional: constructor útil
     public User(String name, String username, String email, String password) {
         this.name = name;
         this.username = username;
