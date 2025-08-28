@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import KanbanBoard from './KanbanBoard';
 import AddBoardModal from './AddBoardModal';
 import AddCardModal from './AddCardModal';
+import AddColumnModal from './AddColumnModal';
 
 const Dashboard = ({onLogout}) => {
     const [user, setUser] = useState(null);
@@ -10,6 +11,7 @@ const Dashboard = ({onLogout}) => {
     const [refreshBoards, setRefreshBoards] = useState(false);
     const [showAddBoardModal, setShowAddBoardModal] = useState(false);
     const [showAddCardModal, setShowAddCardModal] = useState(false);
+    const [showAddColumnModal, setShowAddColumnModal] = useState(false);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -140,6 +142,35 @@ const Dashboard = ({onLogout}) => {
         }
     };
 
+    const handleAddColumn = async (title) => {
+        const token = localStorage.getItem('jwtToken');
+        if (!token) {
+            alert('No estás autenticado.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/columns?title=${encodeURIComponent(title)}&boardId=${activeBoard.id}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization' : `Bearer ${token}`
+                }
+            });
+
+            if(response.ok) {
+                alert(`Columna "${title}" creada con éxito.`);
+                setRefreshBoards(prev => !prev);
+                setShowAddColumnModal(false);
+            } else {
+                const errorData = await response.json();
+                alert(`Error al crear la columna: ${errorData.message}`);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error de conexión al crear la columna");
+        }
+    };
+
     if (!user || !activeBoard) {
         return <div className="p-4">Cargando datos de usuario y tablero...</div>;
     }
@@ -161,6 +192,12 @@ const Dashboard = ({onLogout}) => {
                         className="w-full p-2 bg-green-500 hover:bg-green-600 text-black font-bold rounded-md text-sm"
                     >
                         Añadir Tarjeta
+                    </button>
+                    <button
+                        onClick={() => setShowAddColumnModal(true)}
+                        className="w-full p-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-md text-sm"
+                    >
+                        Añadir Columna
                     </button>
                     <div className="mt-4 space-y-1">
                         {boards.map(board => (
@@ -208,6 +245,11 @@ const Dashboard = ({onLogout}) => {
                 onClose={() => setShowAddCardModal(false)}
                 onAddCard={handleAddCard}
                 columns={activeBoard.columns || []}
+            />
+            <AddColumnModal
+                isOpen={showAddColumnModal}
+                onClose={() => setShowAddColumnModal(false)}
+                onAddColumn={handleAddColumn}
             />
         </div>
     );
