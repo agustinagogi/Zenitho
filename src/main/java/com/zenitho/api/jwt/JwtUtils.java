@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.io.Decoders;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,11 +17,26 @@ import java.util.Date;
 @Component
 public class JwtUtils {
 
-    @Value("${jwt.secret}")
     private String jwtSecret;
+    private UserRepository userRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    public JwtUtils(@Value("${jwt.secret}") String jwtSecret, UserRepository userRepository) {
+        this.jwtSecret = jwtSecret;
+        this.userRepository = userRepository;
+    }
+
+    @PostConstruct
+    public void init() {
+        System.out.println("==================================================");
+        if (jwtSecret != null && !jwtSecret.isEmpty() && !jwtSecret.equals("${jwt.secret}")) {
+            System.out.println("✅ JWT Secret ha sido cargado exitosamente.");
+        } else {
+            System.out.println("❌ ERROR: JWT Secret no se ha cargado. Revisa tu archivo application.properties.");
+            System.out.println("   Valor actual: '" + jwtSecret + "'");
+        }
+        System.out.println("==================================================");
+    }
 
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
