@@ -1,8 +1,6 @@
 package com.zenitho.api.service;
 
-import com.zenitho.api.entities.ERole;
-import com.zenitho.api.entities.Role;
-import com.zenitho.api.entities.User;
+import com.zenitho.api.entities.*;
 import com.zenitho.api.repositories.RoleRepository;
 import com.zenitho.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +25,15 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private BoardService boardService;
+
+    @Autowired
+    private BoardColumnService boardColumnService;
+
+    @Autowired
+    private CardService cardService;
+
     public List<User> getAllUsers(){
         return userRepository.findAll();
     }
@@ -41,6 +48,15 @@ public class UserService {
         Role role = roleRepository.findByName(ERole.ROLE_USER)
                 .orElseThrow(() -> new RuntimeException("Role USER not found"));
         user.getRoles().add(role);
+        User savedUser = userRepository.save(user);
+
+        Board defaultBoard = boardService.createBoard("Mi primer tablero", savedUser.getId());
+        BoardColumn defaultColumn = boardColumnService.createColumn("Tareas pendientes", defaultBoard.getId());
+
+        Card defaultCard = new Card();
+        defaultCard.setTitle("'Bienvenido a Zenitho!");
+        defaultCard.setContent(("{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"text\":\"¡Edita o elimina esta tarjeta para empezar!\",\"type\":\"text\"}]}]}"));
+        cardService.createCard(defaultCard, defaultColumn.getId());
         return userRepository.save(user);
     }
 
