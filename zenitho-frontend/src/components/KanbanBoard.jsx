@@ -1,11 +1,11 @@
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import CardEditor from './CardEditor';
 import CardContent from './CardContent';
-import {DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
-import {arrayMove, SortableContext, horizontalListSortingStrategy,} from '@dnd-kit/sortable';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import Column from './Column';
 
-const KanbanBoard = ({board, setBoard}) => {
+const KanbanBoard = ({ board, setBoard }) => {
     const [editingCardId, setEditingCardId] = useState(null);
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -18,7 +18,7 @@ const KanbanBoard = ({board, setBoard}) => {
 
         try {
             await fetch(`http://localhost:8080/api/cards/${cardId}/content`, {
-                method: 'PATCH', // 👈 Usa el endpoint de PATCH
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -26,7 +26,6 @@ const KanbanBoard = ({board, setBoard}) => {
                 body: JSON.stringify(newContent),
             });
             console.log(`Contenido de la tarjeta ${cardId} actualizado.`);
-            // Opcional: actualiza el estado localmente para reflejar el cambio
             setBoard(prevBoard => {
                 const newBoard = { ...prevBoard };
                 newBoard.columns = newBoard.columns.map(col => ({
@@ -40,33 +39,55 @@ const KanbanBoard = ({board, setBoard}) => {
         }
     };
 
-    const handleDragEnd = (event) =>{
-        const {active, over} = event;
-        if (active.id !== over.id){
-            const oldIndex = board.columns.findIndex((c) => c.id === active.id);
-            const newIndex = board.columns.findIndex((c) => c.id === over.id);
+    const handleDragEnd = async (event) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) {
+            return;
+        }
 
-            const newColumns = arrayMove(board.columns, oldIndex, newIndex);
+        const originalColumns = [...board.columns]; // Guardar el estado original
+        const sortedColumns = [...originalColumns].sort((a, b) => a.position - b.position);
 
-            setBoard(prevBoard => ({ ...prevBoard, columns: newColumns }));
+        const oldIndex = sortedColumns.findIndex((c) => c.id === active.id);
+        const newIndex = sortedColumns.findIndex((c) => c.id === over.id);
 
-            const token = localStorage.getItem('jwtToken');
-            if (!token) return;
+        const reorderedColumns = arrayMove(sortedColumns, oldIndex, newIndex);
 
-            newColumns.forEach(async (column, index) => {
-                try {
-                    await fetch(`http://localhost:8080/api/columns/${column.id}/position?position=${index}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                        },
-                    });
-                } catch (error) {
-                    console.error('Error al actualizar la posición de la columna:', error);
-                    // Opcional: revertir el estado si la API falla
-                    setBoard(board);
-                }
-            });
+        // Actualización optimista de la UI
+        setBoard(prevBoard => ({
+            ...prevBoard,
+            columns: reorderedColumns.map((col, index) => ({ ...col, position: index })),
+        }));
+
+        const token = localStorage.getItem('jwtToken');
+        if (!token) {
+            setBoard(prevBoard => ({ ...prevBoard, columns: originalColumns }));
+            return;
+        }
+
+        const updatePromises = reorderedColumns.map((column, index) =>
+            fetch(`http://localhost:8080/api/columns/${column.id}/position?position=${index}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            })
+        );
+
+        try {
+            const responses = await Promise.all(updatePromises);
+
+            if (responses.some(res => !res.ok)) {
+                throw new Error('Una o más actualizaciones de posición de columna fallaron.');
+            }
+
+            console.log('Todas las posiciones de las columnas se actualizaron correctamente.');
+
+        } catch (error) {
+            console.error('Error al actualizar la posición de las columnas:', error);
+            // Si algo falla, revertir la UI al estado original
+            setBoard(prevBoard => ({ ...prevBoard, columns: originalColumns }));
+            alert('No se pudo guardar el nuevo orden de las columnas. Inténtalo de nuevo.');
         }
     };
 
@@ -75,7 +96,6 @@ const KanbanBoard = ({board, setBoard}) => {
     }
 
     const sortedColumns = board.columns ? [...board.columns].sort((a, b) => a.position - b.position) : [];
-
 
     return (
         <DndContext
