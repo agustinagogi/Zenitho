@@ -5,7 +5,8 @@ import AddCardModal from './AddCardModal';
 
 const Dashboard = () => {
     const [user, setUser] = useState(null);
-    const [boardData, setBoardData] = useState(null);
+    const [boards, setBoards] = useState([]);
+    const [activeBoard, setActiveBoard] = useState(null);
     const [refreshBoards, setRefreshBoards] = useState(false);
     const [showAddBoardModal, setShowAddBoardModal] = useState(false);
     const [showAddCardModal, setShowAddCardModal] = useState(false);
@@ -43,7 +44,13 @@ const Dashboard = () => {
 
                     const boards = await boardResponse.json();
                     if (boards && boards.length > 0) {
-                        setBoardData(boards[0]);
+                        setBoards(boards);
+                        if (activeBoard) {
+                            const current = boards.find(b => b.id === activeBoard.id) || boards[0];
+                            setActiveBoard(current);
+                        } else {
+                            setActiveBoard(boards[0]);
+                        }
                     }
                 } catch (error) {
                     console.error("Error al obtener los datos de la aplicación:", error);
@@ -72,14 +79,17 @@ const Dashboard = () => {
             });
 
             if (response.ok) {
+                const newBoard = await response.json();
                 alert(`Tablero "${title}" creado con éxito.`);
-                setRefreshBoards(prev => !prev);
+                setBoards(prev => [...prev, newBoard]);
+                setActiveBoard(newBoard);
                 setShowAddBoardModal(false);
             } else {
                 const errorData = await response.json();
                 alert(`Error al crear el tablero: ${errorData.message}`);
             }
         } catch (error) {
+            console.error(error);
             alert("Error de conexión al crear el tablero.");
         }
     };
@@ -110,45 +120,61 @@ const Dashboard = () => {
                 alert(`Error al crear la tarjeta: ${errorData.message}`);
             }
         } catch (error) {
+            console.error(error);
             alert("Error de conexión al crear la tarjeta.");
         }
     };
 
-    if (!user || !boardData) {
+    if (!user || !activeBoard) {
         return <div className="p-4">Cargando datos de usuario y tablero...</div>;
     }
 
     return (
         <div className="flex h-screen bg-gray-200">
-            <div className="w-64 bg-white p-4 shadow-md flex-shrink-0 flex flex-col justify-start items-center space-y-6">
+            {/* 👈 Menú lateral izquierdo */}
+            <div className="w-64 bg-white p-4 shadow-md flex-shrink-0 flex flex-col justify-start space-y-6">
                 <h1 className="text-2xl font-bold text-gray-900 mb-8">Zenitho</h1>
                 <div className="w-full space-y-2">
                     <button
                         onClick={() => setShowAddBoardModal(true)}
-                        className="w-full p-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-md"
+                        className="w-full p-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-md text-sm"
                     >
                         Añadir Tablero
                     </button>
                     <button
                         onClick={() => setShowAddCardModal(true)}
-                        className="w-full p-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-md"
+                        className="w-full p-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-md text-sm"
                     >
                         Añadir Tarjeta
                     </button>
+                    <div className="mt-4 space-y-1">
+                        {boards.map(board => (
+                            <div
+                                key={board.id}
+                                onClick={() => setActiveBoard(board)}
+                                className={`p-2 rounded-md cursor-pointer text-center ${activeBoard.id === board.id ? 'bg-gray-300 font-semibold' : 'bg-gray-100 hover:bg-gray-200'}`}
+                            >
+                                {board.title}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
+            {/* 👈 Contenido principal (barra superior y tablero) */}
             <div className="flex-1 flex flex-col">
+                {/* 👈 Barra superior (Navbar) */}
                 <div className="bg-white shadow-md p-4 flex justify-end items-center">
-                    {/* Usamos el nombre real del usuario */}
                     <span className="font-semibold text-gray-900">Bienvenido, {user.name}</span>
                 </div>
 
+                {/* 👈 Contenedor del tablero */}
                 <div className="flex-1 overflow-auto p-4">
-                    <KanbanBoard board={boardData} key={refreshBoards} />
+                    <KanbanBoard board={activeBoard} key={refreshBoards} />
                 </div>
             </div>
 
+            {/* Modales */}
             <AddBoardModal
                 isOpen={showAddBoardModal}
                 onClose={() => setShowAddBoardModal(false)}
@@ -159,7 +185,7 @@ const Dashboard = () => {
                 isOpen={showAddCardModal}
                 onClose={() => setShowAddCardModal(false)}
                 onAddCard={handleAddCard}
-                columns={boardData.columns || []}
+                columns={activeBoard.columns || []}
             />
         </div>
     );
