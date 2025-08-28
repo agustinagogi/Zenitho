@@ -41,11 +41,10 @@ public class BoardController {
     }
 
     @GetMapping
-    public List<Board> getAllBoards () {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName(); // El email es el nombre de autenticación
-        Long userId = jwtUtils.getUserIdFromToken(jwtUtils.generateJwtToken(email));
-        return boardService.getAllBoardsForUser(userId); // 👈 Usa el nuevo método
+    public List<Board> getAllBoards(@RequestHeader("Authorization") String token) {
+        String jwt = token.substring(7);
+        Long userId = jwtUtils.getUserIdFromToken(jwt);
+        return boardService.getAllBoardsForUser(userId);
     }
 
     @GetMapping("/{id}")

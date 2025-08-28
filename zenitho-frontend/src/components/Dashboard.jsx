@@ -67,7 +67,7 @@ const Dashboard = ({onLogout}) => {
         };
 
         fetchUserData();
-    }, [refreshBoards, onLogout, activeBoard]);
+    }, [refreshBoards, onLogout]);
 
     const handleLogoutSuccess = () => {
         localStorage.removeItem('jwtToken');
