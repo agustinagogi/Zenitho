@@ -5,6 +5,7 @@ import com.zenitho.api.entities.User;
 import com.zenitho.api.repositories.BoardRepository;
 import com.zenitho.api.repositories.UserRepository;
 import org.hibernate.engine.jdbc.mutation.TableInclusionChecker;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -13,8 +14,10 @@ import java.util.List;
 @Service
 public class BoardService {
 
+    @Autowired
     BoardRepository boardRepository;
 
+    @Autowired
     UserRepository userRepository;
 
     public Board createBoard(String title, Long userId){
