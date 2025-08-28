@@ -1,14 +1,15 @@
 package com.zenitho.api.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
-
+import lombok.Getter;
+import lombok.Setter;
 import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "boards")
-@Data
+@Getter
+@Setter
 public class Board {
 
     @Id
@@ -18,10 +19,7 @@ public class Board {
     @Column(name = "title", nullable = false)
     private String title;
 
-    // Relaciones
-
-    // Un tablero contiene una lista de columnas
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<BoardColumn> columns;
 
     @ManyToMany
@@ -30,6 +28,5 @@ public class Board {
             joinColumns = @JoinColumn(name = "board_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-
     private Set<User> members;
 }
