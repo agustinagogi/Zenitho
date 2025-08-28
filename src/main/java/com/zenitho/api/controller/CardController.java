@@ -1,6 +1,7 @@
 package com.zenitho.api.controller;
 
 import com.zenitho.api.entities.Card;
+import com.zenitho.api.payload.CardProgress;
 import com.zenitho.api.service.CardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -43,5 +44,10 @@ public class CardController {
     @DeleteMapping("/{id}")
     public void deleteCard(@PathVariable Long id) {
         cardService.deleteCard(id);
+    }
+
+    @GetMapping("/{id}/progress")
+    public CardProgress getCardProgress(@PathVariable Long id) {
+        return cardService.getCardProgress(id);
     }
 }

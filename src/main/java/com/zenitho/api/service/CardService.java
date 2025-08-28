@@ -7,6 +7,9 @@ import com.zenitho.api.repositories.CardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zenitho.api.payload.CardProgress;
 
 import java.util.Collections;
 import java.util.List;
@@ -66,5 +69,62 @@ public class CardService {
             throw new RuntimeException("Card not found with id: " + cardId);
         }
         cardRepository.deleteById(cardId);
+    }
+
+    // Método para calcular el progreso de las subtareas
+    public CardProgress getCardProgress(Long cardId) {
+        Card card = getCardById(cardId);
+        String jsonContent = card.getContent();
+
+        CardProgress progress = new CardProgress();
+
+        if (jsonContent == null || jsonContent.isEmpty()) {
+            progress.setProgressPercentage(0.0);
+            progress.setCompletedTasks(0);
+            progress.setTotalTasks(0);
+            return progress;
+        }
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode rootNode = mapper.readTree(jsonContent);
+
+            int completedTasks = 0;
+            int totalTasks = 0;
+
+            JsonNode contentNode = rootNode.path("content");
+            if (contentNode.isArray()) {
+                for (JsonNode node : contentNode) {
+                    if ("taskList".equals(node.path("type").asText())) {
+                        JsonNode taskItems = node.path("content");
+                        if (taskItems.isArray()) {
+                            for (JsonNode taskItem : taskItems) {
+                                if ("taskItem".equals(taskItem.path("type").asText())) {
+                                    totalTasks++;
+                                    if (taskItem.path("attrs").path("checked").asBoolean()) {
+                                        completedTasks++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            progress.setTotalTasks(totalTasks);
+            progress.setCompletedTasks(completedTasks);
+            if (totalTasks > 0) {
+                progress.setProgressPercentage((double) completedTasks / totalTasks * 100);
+            } else {
+                progress.setProgressPercentage(0.0);
+            }
+
+        } catch (Exception e) {
+            // Manejar errores si el contenido JSON es inválido
+            System.err.println("Error parsing card content JSON: " + e.getMessage());
+            progress.setProgressPercentage(0.0);
+        }
+
+        return progress;
     }
 }
