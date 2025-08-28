@@ -3,7 +3,7 @@ import KanbanBoard from './KanbanBoard';
 import AddBoardModal from './AddBoardModal';
 import AddCardModal from './AddCardModal';
 
-const Dashboard = () => {
+const Dashboard = ({onLogout}) => {
     const [user, setUser] = useState(null);
     const [boards, setBoards] = useState([]);
     const [activeBoard, setActiveBoard] = useState(null);
@@ -60,6 +60,13 @@ const Dashboard = () => {
 
         fetchUserData();
     }, [refreshBoards]);
+
+    const handleLogoutSuccess = () => {
+        localStorage.removeItem('jwtToken');
+        if (onLogout) {
+            onLogout();
+        }
+    };
 
     const handleAddBoard = async (title) => {
         const token = localStorage.getItem('jwtToken');
@@ -164,8 +171,15 @@ const Dashboard = () => {
             {/* 👈 Contenido principal (barra superior y tablero) */}
             <div className="flex-1 flex flex-col">
                 {/* 👈 Barra superior (Navbar) */}
-                <div className="bg-white shadow-md p-4 flex justify-end items-center">
+                <div className="bg-white shadow-md p-4 flex justify-between items-center">
                     <span className="font-semibold text-gray-900">Bienvenido, {user.name}</span>
+
+                    <button
+                        onClick={handleLogoutSuccess}
+                        className="ml-4 p-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-md"
+                    >
+                        Cerrar sesión
+                    </button>
                 </div>
 
                 {/* 👈 Contenedor del tablero */}
