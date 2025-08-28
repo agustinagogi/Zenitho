@@ -19,6 +19,7 @@ public class Card {
 
     @Lob
     @Column(columnDefinition = "TEXT")
+    @Basic(fetch = FetchType.EAGER)
     private String content;
 
     private int position;
