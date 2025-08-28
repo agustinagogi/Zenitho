@@ -38,4 +38,9 @@ public class BoardColumnController {
     public void deleteColumn(@PathVariable Long id) {
         columnService.deleteColumn(id);
     }
+
+    @PatchMapping("/{id}/position")
+    public BoardColumn updateColumnPosition(@PathVariable Long id, @RequestParam double  position) {
+        return columnService.updateColumnPosition(id, position);
+    }
 }
