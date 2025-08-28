@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-@NoArgsConstructor // ✅ genera automáticamente el constructor vacío requerido por JPA
+@NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 public class Role {
@@ -23,11 +23,10 @@ public class Role {
     @Column(nullable = false, unique = true)
     private ERole name;
 
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "roles")
     @JsonIgnore
     private Set<User> users = new HashSet<>();
 
-    // ✅ este es para cuando quieras crear un Role con su enum
     public Role(ERole name) {
         this.name = name;
     }
