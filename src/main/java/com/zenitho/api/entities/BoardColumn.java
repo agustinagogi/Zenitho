@@ -1,5 +1,6 @@
 package com.zenitho.api.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -22,6 +23,7 @@ public class BoardColumn {
     // Relaciones
     @ManyToOne // Muchas columnas pueden pertenecer a un solo tablero
     @JoinColumn(name = "board_id", nullable = false)
+    @JsonIgnore
     private Board board;
 
     // Una columna puede tener muchas tarjetas
