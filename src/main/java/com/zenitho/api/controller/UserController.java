@@ -1,17 +1,36 @@
 package com.zenitho.api.controller;
 
 import com.zenitho.api.entities.User;
+import com.zenitho.api.jwt.JwtUtils;
+import com.zenitho.api.repositories.UserRepository;
 import com.zenitho.api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
+
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    @Autowired
+    private UserRepository userRepository;
+
     public UserController(UserService userService) { this.userService = userService; }
+
+    @GetMapping("/me") // 👈 Nuevo endpoint para obtener los datos del usuario actual
+    public User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName(); // El email del usuario está en el nombre de autenticación
+
+        return userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + userEmail));
+    }
 
     @PostMapping
     public User createUser(@RequestBody User user) {
