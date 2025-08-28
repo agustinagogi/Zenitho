@@ -9,7 +9,23 @@ const AddCardModal = ({ isOpen, onClose, onAddCard, columns }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await onAddCard(title, content, selectedColumnId);
+
+        const formattedContent = JSON.stringify({
+            type: 'doc',
+            content: [
+                {
+                    type: 'paragraph',
+                    content: [
+                        {
+                            type: 'text',
+                            text: content,
+                        },
+                    ],
+                },
+            ],
+        });
+
+        await onAddCard(title, formattedContent, selectedColumnId);
         setTitle('');
         setContent('');
         setSelectedColumnId(columns && columns.length > 0 ? columns[0].id : '');
