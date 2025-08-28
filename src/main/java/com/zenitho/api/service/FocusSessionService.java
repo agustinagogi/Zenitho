@@ -7,6 +7,7 @@ import com.zenitho.api.repositories.CardRepository;
 import com.zenitho.api.repositories.FocusSessionRepository;
 import com.zenitho.api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,8 @@ public class FocusSessionService {
     private UserRepository userRepository;
     @Autowired
     private CardRepository cardRepository;
+    @Autowired // Inyecta la plantilla de mensajería
+    private SimpMessagingTemplate messagingTemplate;
 
     public FocusSession startFocusSession(Long userId, Long cardId){
         User user = userRepository.findById(userId)
@@ -33,7 +36,12 @@ public class FocusSessionService {
         newSession.setCard(card);
         newSession.setStartTime(LocalDateTime.now());
 
-        return focusSessionRepository.save(newSession);
+        FocusSession savedSession = focusSessionRepository.save(newSession);
+
+        // Envía una actualización a los suscriptores de la tarjeta
+        messagingTemplate.convertAndSend("/topic/cards/" + cardId, savedSession);
+
+        return savedSession;
     }
 
     public FocusSession endFocusSession(Long sessionId){
@@ -42,7 +50,12 @@ public class FocusSessionService {
 
         session.setEndTime(LocalDateTime.now());
 
-        return focusSessionRepository.save(session);
+        FocusSession updatedSession = focusSessionRepository.save(session);
+
+        // Envía una actualización a los suscriptores de la tarjeta
+        messagingTemplate.convertAndSend("/topic/cards/" + updatedSession.getCard().getId(), updatedSession);
+
+        return updatedSession;
     }
 
     public List<FocusSession> getSessionsForUser(Long userId){
