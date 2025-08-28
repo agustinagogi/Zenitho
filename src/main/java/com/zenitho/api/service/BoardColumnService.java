@@ -22,9 +22,12 @@ public class BoardColumnService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new RuntimeException("Board not found with id: " + boardId));
 
+        double newPosition = board.getColumns().size();
+
         BoardColumn newColumn = new BoardColumn();
         newColumn.setBoard(board);
         newColumn.setTitle(title);
+        newColumn.setPosition(newPosition);
 
         return columnRepository.save(newColumn);
     }
@@ -50,5 +53,13 @@ public class BoardColumnService {
             throw new RuntimeException("Column not found with id: " + columnId);
         }
         columnRepository.deleteById(columnId);
+    }
+
+    public BoardColumn updateColumnPosition(Long columnId, double newPosition) {
+        BoardColumn existingColumn = columnRepository.findById(columnId)
+                .orElseThrow(() -> new RuntimeException("Column not found with id: " + columnId));
+
+        existingColumn.setPosition(newPosition);
+        return columnRepository.save(existingColumn);
     }
 }
