@@ -28,7 +28,7 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username  = authentication.getName(); // El email del usuario está en el nombre de autenticación
 
-        return userRepository.findByUsername(username )
+        return userRepository.findByEmail(username )
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + username ));
     }
 
