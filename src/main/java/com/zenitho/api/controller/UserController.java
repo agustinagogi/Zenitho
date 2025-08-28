@@ -18,6 +18,11 @@ public class UserController {
         return userService.createUser(user);
     }
 
+    @PostMapping("/admin")
+    public User createAdminUser(@RequestBody User user) {
+        return userService.createAdminUser(user);
+    }
+
     @PutMapping("/{id}")
     public User updateUser(@PathVariable Long id, @RequestBody User user) {
         return userService.updateUser(id, user);
