@@ -1,13 +1,15 @@
 package com.zenitho.api.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
-
+import lombok.Getter;
+import lombok.Setter;
 import java.util.Set;
 
 @Entity
 @Table(name = "cards")
-@Data
+@Getter
+@Setter
 public class Card {
 
     @Id
@@ -19,15 +21,15 @@ public class Card {
 
     @Lob
     @Column(columnDefinition = "TEXT")
-    @Basic(fetch = FetchType.EAGER)
     private String content;
 
     private int position;
 
     private boolean archived = false;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "column_id", nullable = false)
+    @JsonIgnore
     private BoardColumn column;
 
     @ManyToMany
@@ -36,5 +38,6 @@ public class Card {
             joinColumns = @JoinColumn(name = "card_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
+    @JsonIgnore
     private Set<User> assignees;
 }
