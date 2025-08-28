@@ -2,13 +2,14 @@ package com.zenitho.api.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
-
+import lombok.Getter;
+import lombok.Setter;
 import java.util.List;
 
 @Entity
 @Table(name ="board_columns")
-@Data
+@Getter
+@Setter
 public class BoardColumn {
 
     @Id
@@ -20,14 +21,11 @@ public class BoardColumn {
 
     private double position;
 
-    // Relaciones
-    @ManyToOne // Muchas columnas pueden pertenecer a un solo tablero
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", nullable = false)
     @JsonIgnore
     private Board board;
 
-    // Una columna puede tener muchas tarjetas
-    // CascadeType.ALL si borramos una columna, todas las tarjetas que tiene dentro se borrarán automáticamente
-    @OneToMany(mappedBy = "column", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "column", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Card> cards;
 }
