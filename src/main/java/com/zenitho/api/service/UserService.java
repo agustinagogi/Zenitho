@@ -44,6 +44,14 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User createAdminUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        Role role = roleRepository.findByName(ERole.ROLE_ADMIN)
+                .orElseThrow(() -> new RuntimeException("Role ADMIN not found"));
+        user.getRoles().add(role);
+        return userRepository.save(user);
+    }
+
     @Transactional
     public User updateUser(Long id, User user) {
         User db = userRepository.findById(id)
