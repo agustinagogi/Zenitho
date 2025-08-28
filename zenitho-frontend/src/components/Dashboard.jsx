@@ -229,7 +229,7 @@ const Dashboard = ({onLogout}) => {
 
                 {/* 👈 Contenedor del tablero */}
                 <div className="flex-1 overflow-auto p-4">
-                    <KanbanBoard board={activeBoard} key={refreshBoards} />
+                    <KanbanBoard board={activeBoard} setBoard={setActiveBoard} key={refreshBoards} />
                 </div>
             </div>
 
