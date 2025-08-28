@@ -20,9 +20,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        com.zenitho.api.entities.User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException { // 👈 Cambiado a 'email'
+        com.zenitho.api.entities.User user = userRepository.findByEmail(email) // 👈 Usando el nuevo método
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + email));
 
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
