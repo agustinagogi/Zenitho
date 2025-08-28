@@ -24,8 +24,13 @@ function App() {
         setIsLoggedIn(true);
     };
 
+    const handleLogoutSuccess = () => {
+        localStorage.removeItem('jwtToken');
+        setIsLoggedIn(false);
+    }
+
     if (isLoggedIn) {
-        return <Dashboard />;
+        return <Dashboard onLogout={handleLogoutSuccess} />;
     }
 
     return (
