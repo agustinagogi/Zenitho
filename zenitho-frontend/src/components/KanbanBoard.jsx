@@ -1,9 +1,16 @@
 import React, { useState} from 'react';
 import CardEditor from './CardEditor';
 import CardContent from './CardContent';
+import {DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
+import {arrayMove, SortableContext, horizontalListSortingStrategy,} from '@dnd-kit/sortable';
+import Column from './Column';
 
-const KanbanBoard = ({board}) => {
+const KanbanBoard = ({board, setBoard}) => {
     const [editingCardId, setEditingCardId] = useState(null);
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor),
+    );
 
     const handleUpdateCardContent = async (cardId, newContent) => {
         const token = localStorage.getItem('jwtToken');
@@ -33,36 +40,66 @@ const KanbanBoard = ({board}) => {
         }
     };
 
+    const handleDragEnd = (event) =>{
+        const {active, over} = event;
+        if (active.id !== over.id){
+            const oldIndex = board.columns.findIndex((c) => c.id === active.id);
+            const newIndex = board.columns.findIndex((c) => c.id === over.id);
+
+            const newColumns = arrayMove(board.columns, oldIndex, newIndex);
+
+            setBoard(prevBoard => ({ ...prevBoard, columns: newColumns }));
+
+            const token = localStorage.getItem('jwtToken');
+            if (!token) return;
+
+            newColumns.forEach(async (column, index) => {
+                try {
+                    await fetch(`http://localhost:8080/api/columns/${column.id}/position?position=${index}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        },
+                    });
+                } catch (error) {
+                    console.error('Error al actualizar la posición de la columna:', error);
+                    // Opcional: revertir el estado si la API falla
+                    setBoard(board);
+                }
+            });
+        }
+    };
+
     if (!board) {
         return <div className="text-center mt-8">No hay tablero para mostrar.</div>;
     }
 
+    const sortedColumns = board.columns ? [...board.columns].sort((a, b) => a.position - b.position) : [];
+
 
     return (
-        <div className="p-4 bg-gray-200 min-h-screen">
-            <h1 className="text-3xl font-bold mb-6">{board.title}</h1>
-            <div className="flex space-x-4 overflow-x-auto">
-                {board.columns && board.columns.map(column => (
-                    <div key={column.id} className="w-80 p-4 bg-gray-100 rounded-lg shadow-md flex-shrink-0">
-                        <h2 className="text-xl font-semibold mb-4">{column.title}</h2>
-                        {column.cards && column.cards.map(card => (
-                            <div
-                                key={card.id}
-                                className="p-4 bg-white rounded-md shadow mb-4"
-                                onClick={() => setEditingCardId(card.id)} // 👈 Al hacer clic, activa el modo edición
-                            >
-                                <h3>{card.title}</h3>
-                                {editingCardId === card.id ? (
-                                    <CardEditor card={card} onUpdate={handleUpdateCardContent} />
-                                ) : (
-                                    card.content && <CardContent content={card.content} />
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                ))}
-            </div>
-        </div>
+        <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+        >
+            <SortableContext
+                items={sortedColumns.map(c => c.id)}
+                strategy={horizontalListSortingStrategy}
+            >
+                <div className="p-4 bg-gray-200 min-h-screen flex space-x-4 overflow-x-auto">
+                    {sortedColumns.map(column => (
+                        <Column
+                            key={column.id}
+                            column={column}
+                            editingCardId={editingCardId}
+                            setEditingCardId={setEditingCardId}
+                            handleUpdateCardContent={handleUpdateCardContent}
+                        />
+                    ))}
+                </div>
+            </SortableContext>
+        </DndContext>
     );
 };
 
