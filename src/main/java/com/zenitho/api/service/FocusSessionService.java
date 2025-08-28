@@ -6,16 +6,19 @@ import com.zenitho.api.entities.User;
 import com.zenitho.api.repositories.CardRepository;
 import com.zenitho.api.repositories.FocusSessionRepository;
 import com.zenitho.api.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
 public class FocusSessionService {
-
+    @Autowired
     private FocusSessionRepository focusSessionRepository;
-
+    @Autowired
     private UserRepository userRepository;
-
+    @Autowired
     private CardRepository cardRepository;
 
     public FocusSession startFocusSession(Long userId, Long cardId){
