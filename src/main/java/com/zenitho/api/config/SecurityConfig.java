@@ -49,19 +49,18 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults()) // ✅ ACTIVAR CORS
+                .cors(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/boards").authenticated() // 👈 AÑADIDO: Permite el acceso a cualquier usuario autenticado a los tableros
-                        .requestMatchers(HttpMethod.GET, "/api/boards/{id}").authenticated() // 👈 AÑADIDO: Permite el acceso a tableros específicos a cualquier usuario autenticado
+                        .requestMatchers("/api/boards/**").authenticated() // <-- REGLA SIMPLIFICADA
                         .requestMatchers(HttpMethod.POST, "/api/users/admin").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/users/{id}/roles").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasRole("ADMIN") // 👈 NEW
+                        .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasRole("ADMIN")
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
