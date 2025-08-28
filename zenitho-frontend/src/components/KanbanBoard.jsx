@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import CardContent from './CardContent';
 import Column from './Column';
 
 const KanbanBoard = () => {
@@ -62,14 +63,12 @@ const KanbanBoard = () => {
             <h1 className="text-3xl font-bold mb-6">{board.title}</h1>
             <div className="flex space-x-4 overflow-x-auto">
                 {board.columns && board.columns.map(column => (
-                    // Aquí usarás tu componente Column para cada columna
                     <div key={column.id} className="w-80 p-4 bg-gray-100 rounded-lg shadow-md flex-shrink-0">
                         <h2 className="text-xl font-semibold mb-4">{column.title}</h2>
-                        {/* Dentro de cada columna, renderizarás las tarjetas */}
                         {column.cards && column.cards.map(card => (
                             <div key={card.id} className="p-4 bg-white rounded-md shadow mb-4">
                                 <h3>{card.title}</h3>
-                                {card.content}
+                                {card.content && <CardContent content={card.content} />}
                             </div>
                         ))}
                     </div>
