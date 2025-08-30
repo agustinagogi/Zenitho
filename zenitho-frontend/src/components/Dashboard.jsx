@@ -24,7 +24,7 @@ const Dashboard = ({onLogout}) => {
 
             try {
                 // Llamada para obtener los datos del usuario
-                const userResponse = await fetch('http://localhost:8080/api/users/me', {
+                const userResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/me`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -40,7 +40,7 @@ const Dashboard = ({onLogout}) => {
                 setUser(userData);
 
                 // Llamada para obtener los datos de los tableros
-                const boardResponse = await fetch('http://localhost:8080/api/boards', {
+                const boardResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/boards`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -86,7 +86,7 @@ const Dashboard = ({onLogout}) => {
         }
 
         try {
-            const response = await fetch('http://localhost:8080/api/boards', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/boards`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ const Dashboard = ({onLogout}) => {
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/api/cards?columnId=${columnId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/cards?columnId=${columnId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ const Dashboard = ({onLogout}) => {
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/api/columns?title=${encodeURIComponent(title)}&boardId=${activeBoard.id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/columns?title=${encodeURIComponent(title)}&boardId=${activeBoard.id}`, {
                 method: 'POST',
                 headers: {
                     'Authorization' : `Bearer ${token}`

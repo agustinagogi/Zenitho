@@ -22,7 +22,7 @@ const Register = () => {
         // Si no lo incluimos, la página se recargaría y la solicitud fetch no se completaría
 
         try {
-            const response = await fetch('http://localhost:8080/api/users', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
